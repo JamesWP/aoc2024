@@ -6,23 +6,28 @@ pub fn part_one(input: &str) -> Option<u32> {
     left_list.sort();
     right_list.sort();
 
-    Some(left_list.iter().zip(right_list).map(|(left, right)|{
-        left.abs_diff(right)
-    }).sum())
+    Some(
+        left_list
+            .iter()
+            .zip(right_list)
+            .map(|(left, right)| left.abs_diff(right))
+            .sum(),
+    )
 }
 
 fn get_lists(input: &str) -> (Vec<i32>, Vec<i32>) {
+    let line_format = regex::Regex::new(r"(?P<first>\d+)\s+(?P<second>\d+)").unwrap();
+
     let mut left_list = Vec::new();
     let mut right_list = Vec::new();
 
-    input.lines().for_each(|line|{
-        let mut parts= line.split_whitespace().map(|v|v.parse::<i32>().unwrap());
-    
-        let left = parts.next().unwrap();
-        let right = parts.next().unwrap();
-        left_list.push(left);
-        right_list.push(right); 
-    });
+    for line in input.lines() {
+        let cap = line_format.captures(line).unwrap();
+
+        left_list.push(cap["first"].parse().unwrap());
+        right_list.push(cap["second"].parse().unwrap());
+    }
+
     (left_list, right_list)
 }
 
