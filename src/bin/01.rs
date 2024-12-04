@@ -33,8 +33,7 @@ fn get_lists(input: &str) -> (Vec<i32>, Vec<i32>) {
 
 pub fn part_two(input: &str) -> Option<i32> {
     let mut similarity = 0;
-    let (mut left_list, mut right_list) = get_lists(input);
-
+    let (left_list, right_list) = get_lists(input);
     for item in left_list {
         for other in &right_list {
             if *other == item {
