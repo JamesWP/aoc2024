@@ -4,7 +4,11 @@ pub fn part_one(input: &str) -> Option<u32> {
     let mut count = 0;
 
     for line in input.lines() {
-        let levels: Vec<i32> = line.split_whitespace().map(str::parse).map(Result::unwrap).collect();
+        let levels: Vec<i32> = line
+            .split_whitespace()
+            .map(str::parse)
+            .map(Result::unwrap)
+            .collect();
         if safe(levels) {
             count += 1;
         }
@@ -16,16 +20,20 @@ pub fn part_one(input: &str) -> Option<u32> {
 fn safe(levels: Vec<i32>) -> bool {
     let strictly_decreasing = levels.windows(2).filter(|s| s[0] < s[1]).count() == 0;
     let strictly_increasing = levels.windows(2).filter(|s| s[0] > s[1]).count() == 0;
-    let diff_bounded = levels.windows(2).filter(|s| {
-        let diff = (s[0] - s[1]).abs();
+    let diff_bounded = levels
+        .windows(2)
+        .filter(|s| {
+            let diff = (s[0] - s[1]).abs();
 
-        diff > 3 || diff < 1
-    }).count() == 0;
+            diff > 3 || diff < 1
+        })
+        .count()
+        == 0;
 
     if (strictly_decreasing || strictly_increasing) && diff_bounded {
         return true;
     }
-    
+
     return false;
 }
 
@@ -33,7 +41,11 @@ pub fn part_two(input: &str) -> Option<u32> {
     let mut count = 0;
 
     for line in input.lines() {
-        let levels: Vec<i32> = line.split_whitespace().map(str::parse).map(Result::unwrap).collect();
+        let levels: Vec<i32> = line
+            .split_whitespace()
+            .map(str::parse)
+            .map(Result::unwrap)
+            .collect();
         for (i, _level) in levels.iter().enumerate() {
             let mut levels = levels.clone();
             levels.remove(i);
