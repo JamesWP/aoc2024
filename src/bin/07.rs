@@ -42,7 +42,8 @@ fn can_operations_make(result: i64, numbers: &mut [i64], can_cons: bool) -> bool
         return true;
     }
     if can_cons {
-        rest[0] = rest_base * first;
+        let new_rest: i64 = format!("{first}{rest_base}").parse().unwrap();
+        rest[0] = new_rest;
         if can_operations_make(result, rest, can_cons) {
             rest[0] = rest_base;
             return true;
@@ -63,8 +64,8 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(input.lines().filter(|line: &&str| possible(*line).0).map(the_test_value).sum::<i64>()as u64)
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<u64> {
+    Some(input.lines().filter(|line: &&str| possible(*line).1).map(the_test_value).sum::<i64>()as u64)
 }
 
 #[cfg(test)]
@@ -78,13 +79,13 @@ mod tests {
     #[test]
     fn extra() {
         let mut numbers = vec![8, 551, 4, 28, 153];
-        assert_eq!(can_operations_make(85592486, &mut numbers[..]), false);
+        assert_eq!(can_operations_make(85592486, &mut numbers[..], false), false);
 
         let mut numbers = vec![3, 1, 175, 2, 767];
-        assert_eq!(can_operations_make(159536, &mut numbers[..]), false);
+        assert_eq!(can_operations_make(159536, &mut numbers[..], false), false);
 
         let mut numbers = vec![2, 384, 25, 795, 94];
-        assert_eq!(can_operations_make(10539, &mut numbers[..]), true);
+        assert_eq!(can_operations_make(10539, &mut numbers[..], false), true);
     }
 
     #[test]
@@ -96,6 +97,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(11387));
     }
 }
