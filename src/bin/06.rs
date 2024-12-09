@@ -1,21 +1,21 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 advent_of_code::solution!(6);
 
 struct Grid {
-    cells: HashMap<(i32, i32), char>,
+    cells: Vec<char>,
     starting_location: (i32, i32),
     size: (i32, i32),
 }
 
 impl From<&str> for Grid {
     fn from(input: &str) -> Self {
-        let mut cells = HashMap::new();
+        let mut cells = Vec::new();
         let mut starting_location = (0, 0);
 
         for (y, line) in input.lines().enumerate() {
             for (x, c) in line.chars().enumerate() {
-                cells.insert((x as i32, y as i32), c);
+                cells.push(c);
                 if c == '^' {
                     starting_location = (x as i32, y as i32);
                 }
@@ -38,11 +38,15 @@ impl Grid {
     }
 
     fn occupied(&self, location: (i32, i32)) -> bool {
-        if let Some(&c) = self.cells.get(&location) {
-            c == '#'
-        } else {
-            false
+        // we must first do a bounds check
+        if !self.contains(location) {
+            return false;
         }
+        let index = (location.1 * self.size.0 + location.0) as isize;
+        // we can safely unwrap here because we know the index is valid
+        // This is unsafe because i want to go fast, don't ask
+        let cell = unsafe {self.cells.as_ptr().offset(index).read()};
+        cell == '#'
     }
 }
 
@@ -64,8 +68,7 @@ fn path_to_escape(grid: &Grid, want_path: bool) -> Length {
     let mut direction = (0, -1);
     let mut visited: HashSet<(i32, i32)> = HashSet::new();
 
-
-    let mut path: HashSet<((i32, i32), (i32,i32))> = HashSet::new();
+    let mut path: BTreeSet<((i32, i32), (i32,i32))> = BTreeSet::new();
     loop {
         if !grid.contains(location) {
             if want_path {
@@ -117,13 +120,13 @@ pub fn part_two(input: &str) -> Option<u32> {
             continue;
         }
 
-        grid.cells.insert(position, '#');
+        grid.cells[position.1 as usize * grid.size.0 as usize + position.0 as usize] = '#';
 
         if let Length::Infinite = path_to_escape(&grid, false) {
             count += 1;
         }
 
-        grid.cells.insert(position, '.');
+        grid.cells[position.1 as usize * grid.size.0 as usize + position.0 as usize] = '.';
     }
 
     Some(count)
