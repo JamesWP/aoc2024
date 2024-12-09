@@ -22,7 +22,10 @@ impl From<&str> for Grid {
             }
         }
 
-        let size = (input.lines().next().unwrap().len() as i32, input.lines().count() as i32);
+        let size = (
+            input.lines().next().unwrap().len() as i32,
+            input.lines().count() as i32,
+        );
 
         Grid {
             cells,
@@ -45,7 +48,7 @@ impl Grid {
         let index = (location.1 * self.size.0 + location.0) as isize;
         // we can safely unwrap here because we know the index is valid
         // This is unsafe because i want to go fast, don't ask
-        let cell = unsafe {self.cells.as_ptr().offset(index).read()};
+        let cell = unsafe { self.cells.as_ptr().offset(index).read() };
         cell == '#'
     }
 }
@@ -68,7 +71,7 @@ fn path_to_escape(grid: &Grid, want_path: bool) -> Length {
     let mut direction = (0, -1);
     let mut visited: HashSet<(i32, i32)> = HashSet::new();
 
-    let mut path: BTreeSet<((i32, i32), (i32,i32))> = BTreeSet::new();
+    let mut path: BTreeSet<((i32, i32), (i32, i32))> = BTreeSet::new();
     loop {
         if !grid.contains(location) {
             if want_path {
@@ -115,7 +118,6 @@ pub fn part_two(input: &str) -> Option<u32> {
     };
 
     for position in cells {
-
         if grid.occupied(position) {
             continue;
         }
