@@ -1,4 +1,3 @@
-
 advent_of_code::solution!(7);
 
 fn possible(line: &str) -> (bool, bool) {
@@ -13,8 +12,10 @@ fn possible(line: &str) -> (bool, bool) {
         .collect();
     let test_result: i64 = the_test_value(line);
 
-    (can_operations_make(test_result, &mut numbers[..], false),
-    can_operations_make(test_result, &mut numbers[..], true))
+    (
+        can_operations_make(test_result, &mut numbers[..], false),
+        can_operations_make(test_result, &mut numbers[..], true),
+    )
 }
 
 fn can_operations_make(result: i64, numbers: &mut [i64], can_cons: bool) -> bool {
@@ -59,13 +60,24 @@ fn the_test_value(line: &str) -> i64 {
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-
     // Too low: 1836066741
-    Some(input.lines().filter(|line: &&str| possible(*line).0).map(the_test_value).sum::<i64>()as u64)
+    Some(
+        input
+            .lines()
+            .filter(|line: &&str| possible(*line).0)
+            .map(the_test_value)
+            .sum::<i64>() as u64,
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    Some(input.lines().filter(|line: &&str| possible(*line).1).map(the_test_value).sum::<i64>()as u64)
+    Some(
+        input
+            .lines()
+            .filter(|line: &&str| possible(*line).1)
+            .map(the_test_value)
+            .sum::<i64>() as u64,
+    )
 }
 
 #[cfg(test)]
@@ -79,7 +91,10 @@ mod tests {
     #[test]
     fn extra() {
         let mut numbers = vec![8, 551, 4, 28, 153];
-        assert_eq!(can_operations_make(85592486, &mut numbers[..], false), false);
+        assert_eq!(
+            can_operations_make(85592486, &mut numbers[..], false),
+            false
+        );
 
         let mut numbers = vec![3, 1, 175, 2, 767];
         assert_eq!(can_operations_make(159536, &mut numbers[..], false), false);
