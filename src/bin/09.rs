@@ -1,143 +1,187 @@
 use std::fmt::Write;
 
+use itertools::Itertools;
+
 advent_of_code::solution!(9);
 
-#[derive(Debug, Clone, Copy)]
-enum Block {
-    File { id: usize, size: usize },
-    FreeSpace { size: usize },
-}
-
-impl From<(usize, char)> for Block {
-    fn from((index, c): (usize, char)) -> Self {
-        let file = index % 2 == 0;
-        let size = c.to_digit(10).unwrap() as usize;
-        if file {
-            Block::File {
-                id: index / 2,
-                size,
-            }
-        } else {
-            Block::FreeSpace { size }
-        }
-    }
-}
-
-impl std::fmt::Display for Block {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Block::File { id, size } => {
-                for _ in 0..*size {
-                    f.write_str(&(id%10).to_string()).unwrap();
-                }
-                Ok(())
-            }
-            Block::FreeSpace { size } => {
-                for _ in 0..*size {
-                    f.write_char('.').unwrap();
-                }
-                Ok(())
-            },
-        }
-    }
-}
-
-fn debug(blocks: &[Block]) {
-    // for block in blocks {
-    //     print!("{:}", block);
-    // }
-    // println!();
-}
-
 pub fn part_one(input: &str) -> Option<usize> {
-    let mut blocks: Vec<Block> = input.trim().char_indices().map(Block::from).collect();
-    let orig_blocks = blocks.clone();
-    assert!(blocks.len() % 2 == 1);
+    let input = input.trim();
+    let input: Vec<_> = input.chars().map(|c| c.to_digit(10).unwrap()).collect();
 
-    let mut defrag_blocks: Vec<Block> = Vec::new();
+    let mut blocks: Vec<i64> = Vec::new();
 
-    let mut left = 0;
-    let mut right = blocks.len() - 1;
+    let mut free = false;
+    let mut file_id = 0;
 
-    while left < right {
-        debug(&orig_blocks);
-        debug(&defrag_blocks);
-        let free_space = match &blocks[left] {
-            Block::File { .. } => {
-                defrag_blocks.push(blocks[left].clone());
-                left += 1;
-                continue;
-            }
-            Block::FreeSpace { size } => *size,
-        };
-        // We have some free space on the left
-
-        let (file_id, file_size) = match &blocks[right] {
-            Block::File { id, size } => (*id, *size),
-            Block::FreeSpace { .. } => {
-                right -= 1;
-                continue;
-            }
-        };
-        // We have a file on the right
-
-        // Transfer some bytes over
-        let transfer_size = std::cmp::min(file_size, free_space);
-        if file_size - transfer_size > 0 {
-            // remember if we're partially though when we're done
-            blocks[right] = Block::File {
-                id: file_id,
-                size: file_size - transfer_size,
-            };
+    for size in input.into_iter() {
+        if free {
+            blocks.extend((0..size).map(|_| -1));
+            free = false;
         } else {
-            right -= 1;
-        }
-
-        defrag_blocks.push(Block::File {
-            id: file_id,
-            size: transfer_size,
-        });
-
-        if free_space - transfer_size > 0 {
-            blocks[left] = Block::FreeSpace {
-                size: free_space - transfer_size,
-            };
-        } else {
-            left += 1;
+            blocks.extend((0..size).map(|_| file_id.clone()));
+            file_id += 1;
+            free = true;
         }
     }
-    match &blocks[right] {
-        Block::File { id, size } => {
-            defrag_blocks.push(Block::File{id: *id, size: *size});
-        },
-        _ => ()
+
+    // println!(
+    //     "{}",
+    //     blocks
+    //         .iter()
+    //         .map(|i| if *i >= 0 {
+    //             i.to_string().chars().next().unwrap()
+    //         } else {
+    //             '.'
+    //         })
+    //         .collect::<String>()
+    // );
+
+    let mut l_idx = 0;
+    let mut r_idx = blocks.len() - 1;
+
+    while l_idx < r_idx {
+        if blocks[l_idx] >= 0 {
+            l_idx += 1;
+            continue;
+        }
+        if blocks[r_idx] < 0 {
+            r_idx -= 1;
+            continue;
+        }
+        blocks[l_idx] = blocks[r_idx];
+        blocks[r_idx] = -1;
+        l_idx += 1;
+        r_idx -= 1;
     }
 
-    let blocks = defrag_blocks;
+    // println!(
+    //     "{}",
+    //     blocks
+    //         .iter()
+    //         .map(|i| if *i >= 0 {
+    //             i.to_string().chars().next().unwrap()
+    //         } else {
+    //             '.'
+    //         })
+    //         .collect::<String>()
+    // );
 
-    let checksum = blocks.into_iter().fold((0, 0), |acc, block| {
-        let (block_idx, checksum) = acc;
-        let size = match block {
-            Block::File { size, .. } => size,
-            Block::FreeSpace { size } => size,
-        };
-        let block_id = match block {
-            Block::File { id, .. } => id,
-            Block::FreeSpace { .. } => 0,
-        };
+    let checksum = blocks
+        .into_iter()
+        .enumerate()
+        .map(|(i, b)| if b > 0 { b * (i as i64) } else { 0 })
+        .sum::<i64>();
 
-        let block_sum: usize = (block_idx..block_idx + size)
-            .map(|block_idx| block_idx * block_id)
-            .sum();
-
-        (block_idx + size, checksum + block_sum)
-    });
-
-    Some(checksum.1.try_into().unwrap())
+    Some(checksum.try_into().unwrap())
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<u64> {
+    let input = input.trim();
+    let input: Vec<_> = input
+        .chars()
+        .map(|c| c.to_digit(10).unwrap() as usize)
+        .collect();
+
+    let mut files: Vec<(usize, usize, usize)> = Vec::new();
+
+    let mut free = false;
+    let mut file_id = 0;
+    let mut beginning = 0;
+    for size in input.into_iter() {
+        if free {
+            free = false;
+        } else {
+            files.push((file_id, beginning, size));
+            file_id += 1;
+            free = true;
+        }
+        beginning += size;
+    }
+
+    let total_size = beginning;
+    // dbg!(total_size);
+    let mut blocks: Vec<i64> = Vec::with_capacity(total_size);
+    blocks.resize(total_size, -1);
+
+    for (file_id, beginning, size) in files.iter().cloned() {
+        let file = &mut blocks[beginning..beginning + size];
+        file.fill(file_id as i64);
+    }
+
+    // println!(
+    //     "{}",
+    //     blocks
+    //         .iter()
+    //         .map(|i| if *i >= 0 {
+    //             i.to_string().chars().next().unwrap()
+    //         } else {
+    //             '.'
+    //         })
+    //         .collect::<String>()
+    // );
+
+    for (file_id, beginning, size) in files.into_iter().rev() {
+        use itertools::FoldWhile::{Continue, Done};
+
+        let mut file_final_location: usize = beginning.try_into().unwrap();
+        // place file at beginning..beginning+size
+        // find if there is space in 0..beginning which will fit size bytes
+        let gap = blocks
+            .iter()
+            .take(beginning)
+            .cloned()
+            .enumerate()
+            .fold_while((0, 0), |(acc_idx, count), (idx, v)| {
+                if v == -1 {
+                    if count + 1 == size {
+                        // we found a gap with enough space
+                        Done((acc_idx, count + 1))
+                    } else {
+                        // gap is not done yet
+                        Continue((acc_idx, count + 1))
+                    }
+                } else {
+                    // gap is done, start over
+                    Continue((idx+1, 0))
+                }
+            });
+
+        match gap {
+            Done((idx, count)) => {
+                assert!(size <= count);
+                file_final_location = idx;
+
+                // remove from original location
+                let file = &mut blocks[beginning..beginning + size];
+                file.fill(-1);
+            }
+            _ => {}
+        }
+
+        // place file there
+        let file = &mut blocks[file_final_location..file_final_location + size];
+        file.fill(file_id as i64);
+
+        // println!(
+        //     "{}",
+        //     blocks
+        //         .iter()
+        //         .map(|i| if *i >= 0 {
+        //             i.to_string().chars().next().unwrap()
+        //         } else {
+        //             '.'
+        //         })
+        //         .collect::<String>()
+        // );
+    }
+
+    let checksum = blocks
+        .into_iter()
+        .enumerate()
+        .map(|(i, b)| if b > 0 { b * (i as i64) } else { 0 })
+        .sum::<i64>();
+
+    Some(checksum.try_into().unwrap())
 }
 
 #[cfg(test)]
@@ -153,6 +197,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(2858));
     }
 }
