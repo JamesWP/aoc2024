@@ -142,7 +142,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     }
                 } else {
                     // gap is done, start over
-                    Continue((idx+1, 0))
+                    Continue((idx + 1, 0))
                 }
             });
 
