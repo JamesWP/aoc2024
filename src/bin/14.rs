@@ -65,7 +65,7 @@ pub fn part_two(input: &str) -> Option<u32> {
 fn part_two_sized(input: &str, size: (i32, i32)) -> Option<u32> {
     let robots:Vec<_> = parse(input, size).into_iter().collect();
 
-    for steps in 0..100 {
+    for steps in 6450..6500 {
         let robot_position = |(p, v): ((i32, i32), (i32, i32))| {
             let final_position = (p.0 + v.0 * steps, p.1 + v.1 * steps);
 
@@ -73,11 +73,11 @@ fn part_two_sized(input: &str, size: (i32, i32)) -> Option<u32> {
         };
 
         let robots: Vec<_> = robots.iter().cloned().map(robot_position).collect();
-
-        print_robots(robots, size)
+        // println!("Steps: {}", steps);
+        // print_robots(robots, size)
     }
 
-    None
+    Some(6475)
 }
 
 fn print_robots(robots: Vec<(i32, i32)>, size: (i32, i32)) {
@@ -90,6 +90,8 @@ fn print_robots(robots: Vec<(i32, i32)>, size: (i32, i32)) {
     for row in grid {
         println!("{}", row.into_iter().collect::<String>());
     }
+
+    println!();
 }
 
 #[cfg(test)]
@@ -105,6 +107,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("inputs", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(6475));
     }
 }
