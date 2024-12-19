@@ -27,12 +27,12 @@ impl Maze {
         // Using recursive DFS walk through the maze, keeping track of the shortest distance found
 
         // set best distance to max value
-        let mut best_distance = vec![vec![i32::MAX; self.data.len()]; 4];
+        let mut best_distance = vec![i32::MAX; self.data.len()];
 
         self.shortest_distance_recursive(self.start, 0, 1, &mut best_distance, &mut Vec::new())
     }
 
-    fn shortest_distance_recursive(&self, position: i32, distance: i32, direction: u8, best_distance: &mut Vec<Vec<i32>>, visited: &mut Vec<i32>) -> i32 {
+    fn shortest_distance_recursive(&self, position: i32, distance: i32, direction: u8, best_distance: &mut Vec<i32>, visited: &mut Vec<i32>) -> i32 {
         // Check if we have reached the end of the maze
         if position == self.end {
             println!("Found end of maze, distance: {}", distance);
@@ -45,10 +45,10 @@ impl Maze {
         }
 
         // Check if we have found a shorter path to this position
-        if distance >= best_distance[direction as usize][position as usize] {
+        if distance >= best_distance[position as usize] {
             return i32::MAX;
         } else {
-            best_distance[direction as usize][position as usize] = distance;
+            best_distance[position as usize] = distance;
         }
 
         // Mark this position as visited
