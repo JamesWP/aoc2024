@@ -1,3 +1,5 @@
+use std::{cmp::Reverse, collections::{BinaryHeap, HashSet}};
+
 advent_of_code::solution!(16);
 
 struct Maze {
@@ -23,78 +25,70 @@ impl From<&str> for Maze {
 }
 
 impl Maze {
-    fn shortest_distance(&self) -> i32 {
-        // Using recursive DFS walk through the maze, keeping track of the shortest distance found
+    fn neighbors(&self, pos: i32, direction: i8) -> [Option<(i32, i8)>; 3] {
+        // we can either turn left, right or go straight
+        let left = (direction -1).rem_euclid(4);
+        let right = (direction + 1).rem_euclid(4);
+        let straight = pos + match direction {
+            0 => -self.size.1,
+            1 => 1,
+            2 => self.size.1,
+            3 => -1,
+            _ => unreachable!(),
+        };
 
-        // set best distance to max value
-        let mut best_distance = vec![i32::MAX; self.data.len()];
+        let mut out = [Some((pos, left)), Some((pos, right)), Some((straight, direction))];
 
-        self.shortest_distance_recursive(self.start, 0, 1, &mut best_distance, &mut Vec::new())
+        out.iter_mut().for_each(|a| {
+            if let Some((pos, _direction)) = a {
+                if !self.data[*pos as usize] {
+                    *a = None;
+                }
+            }
+        });
+
+        out
     }
 
-    fn shortest_distance_recursive(&self, position: i32, distance: i32, direction: u8, best_distance: &mut Vec<i32>, visited: &mut Vec<i32>) -> i32 {
-        // Check if we have reached the end of the maze
-        if position == self.end {
-            println!("Found end of maze, distance: {}", distance);
-            return distance;
+    fn shortest_distance(&self) -> i32 {
+        // using dijkstra's algorithm, calculate the shortest path from each node to the end
+        let mut distances = vec![vec![i32::MAX; 4]; self.data.len()];
+        let mut queue: BinaryHeap<Reverse<(i32, i32, i8)>> = BinaryHeap::new();
+
+        distances[self.start as usize][1] = 0;
+        queue.push(std::cmp::Reverse((0, self.start, 1)));
+
+        while let Some(std::cmp::Reverse((distance, pos, direction))) = queue.pop() {
+            // println!("{} {}x{} {}", distance, pos / self.size.1, pos % self.size.1, direction);
+            // self.print_maze(pos, direction);
+
+            let neighbors = self.neighbors(pos, direction);
+            for (neighbor_pos, neighbour_direction) in neighbors.into_iter().filter_map(|a| a) {
+                assert!((neighbor_pos == pos) ^ (neighbour_direction == direction));
+                let new_distance = distance + if direction == neighbour_direction { 1 } else { 1000 };
+                if new_distance < distances[neighbor_pos as usize][neighbour_direction as usize] {
+                    distances[neighbor_pos as usize][neighbour_direction as usize] = new_distance;
+                    queue.push(std::cmp::Reverse((new_distance, neighbor_pos, neighbour_direction)));
+                }
+            }
         }
 
-        // Check if we have visited this position before
-        if visited.contains(&position) {
-            return i32::MAX;
+        distances[self.end as usize].iter().copied().min().unwrap()
+    }
+
+    fn print_maze(&self, pos: i32, direction: i8) {
+        for (i, row) in self.data.chunks(self.size.1 as usize).enumerate() {
+            for (j, cell) in row.iter().enumerate() {
+                if i == pos as usize / self.size.1 as usize && j == pos as usize % self.size.1 as usize {
+                    print!("\x1b[31m");
+                } else {
+                    print!("\x1b[0m");
+                }
+                print!("{}", if *cell { '.' } else { '#' });
+            }
+            println!();
         }
-
-        // Check if we have found a shorter path to this position
-        if distance >= best_distance[position as usize] {
-            return i32::MAX;
-        } else {
-            best_distance[position as usize] = distance;
-        }
-
-        // Mark this position as visited
-        visited.push(position);
-
-        // Check if we can move up
-        let up_position = (position - self.size.1) as usize;
-        let up = if self.data[up_position] {
-            let cost = if direction == 0 { 1 } else { 1001 };
-            self.shortest_distance_recursive(up_position as i32, distance + cost, 0, best_distance, visited)
-        } else {
-            i32::MAX
-        };
-
-        // Check if we can move right
-        let right_position = (position + 1) as usize;
-        let right = if self.data[right_position] {
-            let cost = if direction == 1 { 1 } else { 1001 };
-            self.shortest_distance_recursive(right_position as i32, distance + cost, 1, best_distance, visited)
-        } else {
-            i32::MAX
-        };
-
-        // Check if we can move down
-        let down_position = (position + self.size.1) as usize;
-        let down = if self.data[down_position] {
-            let cost = if direction == 2 { 1 } else { 1001 };
-            self.shortest_distance_recursive(down_position as i32, distance + cost, 2, best_distance, visited)
-        } else {
-            i32::MAX
-        };
-
-        // Check if we can move left
-        let left_position = (position - 1) as usize;
-        let left = if self.data[left_position] {
-            let cost = if direction == 3 { 1 } else { 1001 };
-            self.shortest_distance_recursive(left_position as i32, distance + cost, 3, best_distance, visited)
-        } else {
-            i32::MAX
-        };
-
-        // Unmark this position as visited
-        visited.pop();
-
-        // Return the shortest distance found
-        up.min(right).min(down).min(left)
+        println!();
     }
 }
 
@@ -104,8 +98,7 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
-}
+    None}
 
 #[cfg(test)]
 mod tests {
@@ -120,6 +113,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(64));
     }
 }
