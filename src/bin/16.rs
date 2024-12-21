@@ -81,10 +81,17 @@ impl Maze {
             for (j, cell) in row.iter().enumerate() {
                 if i == pos as usize / self.size.1 as usize && j == pos as usize % self.size.1 as usize {
                     print!("\x1b[31m");
+                    print!("{}", match direction {
+                        0 => '^',
+                        1 => '>',
+                        2 => 'v',
+                        3 => '<',
+                        _ => unreachable!(),
+                    });
                 } else {
                     print!("\x1b[0m");
+                    print!("{}", if *cell { '.' } else { '#' });
                 }
-                print!("{}", if *cell { '.' } else { '#' });
             }
             println!();
         }
@@ -98,7 +105,10 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None}
+    let maze = Maze::from(input);
+    let shortest_distance = maze.shortest_distance();
+    Some(maze.paths_at_most_given_distance(shortest_distance).try_into().unwrap())
+}
 
 #[cfg(test)]
 mod tests {
