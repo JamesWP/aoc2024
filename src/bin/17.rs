@@ -11,7 +11,6 @@ struct Computer {
 }
 
 impl Computer {
-
     fn combo(&self, n: i64) -> i64 {
         match n {
             0..=3 => n,
@@ -22,7 +21,11 @@ impl Computer {
         }
     }
     fn output_string(&self) -> String {
-        self.output.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(",")
+        self.output
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>()
+            .join(",")
     }
     fn run_test_program() -> String {
         /*
@@ -93,7 +96,11 @@ impl Computer {
             break;
         }
 
-        output.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(",")
+        output
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>()
+            .join(",")
     }
 }
 
@@ -113,7 +120,10 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        assert_eq!(Computer::run_test_program(), "4,6,3,5,6,3,5,2,1,0".to_string());
+        assert_eq!(
+            Computer::run_test_program(),
+            "4,6,3,5,6,3,5,2,1,0".to_string()
+        );
         assert_eq!(Computer::run_program(), "6,4,6,0,4,5,7,2,7".to_string());
     }
 

@@ -1,4 +1,7 @@
-use std::{cmp::Reverse, collections::{BinaryHeap, HashSet}};
+use std::{
+    cmp::Reverse,
+    collections::{BinaryHeap, HashSet},
+};
 
 advent_of_code::solution!(16);
 
@@ -16,28 +19,41 @@ impl From<&str> for Maze {
             .map(|line| line.chars().collect::<Vec<_>>())
             .flatten()
             .collect::<Vec<_>>();
-        let size = (input.lines().count() as i32, input.lines().next().unwrap().len() as i32);
+        let size = (
+            input.lines().count() as i32,
+            input.lines().next().unwrap().len() as i32,
+        );
         let start = data.iter().position(|&c| c == 'S').unwrap() as i32;
         let end = data.iter().position(|&c| c == 'E').unwrap() as i32;
         let data = data.iter().map(|&c| c != '#').collect::<Vec<_>>();
-        Maze { data, size, start, end }
+        Maze {
+            data,
+            size,
+            start,
+            end,
+        }
     }
 }
 
 impl Maze {
     fn neighbors(&self, pos: i32, direction: i8) -> [Option<(i32, i8)>; 3] {
         // we can either turn left, right or go straight
-        let left = (direction -1).rem_euclid(4);
+        let left = (direction - 1).rem_euclid(4);
         let right = (direction + 1).rem_euclid(4);
-        let straight = pos + match direction {
-            0 => -self.size.1,
-            1 => 1,
-            2 => self.size.1,
-            3 => -1,
-            _ => unreachable!(),
-        };
+        let straight = pos
+            + match direction {
+                0 => -self.size.1,
+                1 => 1,
+                2 => self.size.1,
+                3 => -1,
+                _ => unreachable!(),
+            };
 
-        let mut out = [Some((pos, left)), Some((pos, right)), Some((straight, direction))];
+        let mut out = [
+            Some((pos, left)),
+            Some((pos, right)),
+            Some((straight, direction)),
+        ];
 
         out.iter_mut().for_each(|a| {
             if let Some((pos, _direction)) = a {
@@ -65,10 +81,19 @@ impl Maze {
             let neighbors = self.neighbors(pos, direction);
             for (neighbor_pos, neighbour_direction) in neighbors.into_iter().filter_map(|a| a) {
                 assert!((neighbor_pos == pos) ^ (neighbour_direction == direction));
-                let new_distance = distance + if direction == neighbour_direction { 1 } else { 1000 };
+                let new_distance = distance
+                    + if direction == neighbour_direction {
+                        1
+                    } else {
+                        1000
+                    };
                 if new_distance < distances[neighbor_pos as usize][neighbour_direction as usize] {
                     distances[neighbor_pos as usize][neighbour_direction as usize] = new_distance;
-                    queue.push(std::cmp::Reverse((new_distance, neighbor_pos, neighbour_direction)));
+                    queue.push(std::cmp::Reverse((
+                        new_distance,
+                        neighbor_pos,
+                        neighbour_direction,
+                    )));
                 }
             }
         }
@@ -79,15 +104,20 @@ impl Maze {
     fn print_maze(&self, pos: i32, direction: i8) {
         for (i, row) in self.data.chunks(self.size.1 as usize).enumerate() {
             for (j, cell) in row.iter().enumerate() {
-                if i == pos as usize / self.size.1 as usize && j == pos as usize % self.size.1 as usize {
+                if i == pos as usize / self.size.1 as usize
+                    && j == pos as usize % self.size.1 as usize
+                {
                     print!("\x1b[31m");
-                    print!("{}", match direction {
-                        0 => '^',
-                        1 => '>',
-                        2 => 'v',
-                        3 => '<',
-                        _ => unreachable!(),
-                    });
+                    print!(
+                        "{}",
+                        match direction {
+                            0 => '^',
+                            1 => '>',
+                            2 => 'v',
+                            3 => '<',
+                            _ => unreachable!(),
+                        }
+                    );
                 } else {
                     print!("\x1b[0m");
                     print!("{}", if *cell { '.' } else { '#' });
