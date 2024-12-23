@@ -88,24 +88,27 @@ impl Trie {
 }
 
 fn is_possible(s: &str, trie: &Trie) -> bool {
-    let mut stack = vec![0];
-    let mut visited = vec![false; s.len()];
-    while let Some(start) = stack.pop() {
-        visited[start] = true;
-        for prefix in trie.all_prefix_matches(&s[start..]) {
-            if prefix.len() == s.len() - start {
-                return true;
-            }
-            if visited[start + prefix.len()] {
-                continue;
-            }
-            stack.push(start + prefix.len());
-        }
-    }
-    false
+    count_possible(s, trie) != 0
 }
 
-pub fn part_one(input: &str) -> Option<u32> {
+fn count_possible(s: &str, trie: &Trie) -> i64 {
+    let mut score = vec![0; s.len() + 1];
+
+    score[0] = 1;
+
+    for idx in 0..s.chars().count() {
+        for prefix in trie.all_prefix_matches(&s[idx..]) {
+            if idx + prefix.len() > s.len() {
+                continue;
+            }
+            score[idx + prefix.len()] += score[idx]
+        }
+    }
+
+    score[s.len()]
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
     let mut trie = Trie::new();
     for line in input.lines().take_while(|line| !line.is_empty()) {
         for bit in line.split(",") {
@@ -123,8 +126,19 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(count)
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<u64> {
+    let mut trie = Trie::new();
+    for line in input.lines().take_while(|line| !line.is_empty()) {
+        for bit in line.split(",") {
+            trie.insert(bit.trim());
+        }
+    }
+
+    let mut count = 0;
+    for line in input.lines().skip_while(|line| !line.is_empty()).skip(1) {
+        count += count_possible(line, &trie);
+    }
+    Some(count.try_into().unwrap())
 }
 
 #[cfg(test)]
@@ -140,6 +154,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(16));
     }
 }
