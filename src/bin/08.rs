@@ -5,7 +5,6 @@ use itertools::Itertools;
 advent_of_code::solution!(8);
 
 struct Grid {
-    cells: Vec<char>,
     size: (i32, i32),
     antennas: HashMap<char, Vec<(i32, i32)>>,
 }
@@ -33,7 +32,6 @@ impl From<&str> for Grid {
         );
 
         Grid {
-            cells,
             size,
             antennas,
         }

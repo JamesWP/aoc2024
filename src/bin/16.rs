@@ -1,6 +1,6 @@
 use std::{
     cmp::Reverse,
-    collections::{BinaryHeap, HashSet},
+    collections::BinaryHeap
 };
 
 advent_of_code::solution!(16);
@@ -101,6 +101,7 @@ impl Maze {
         distances[self.end as usize].iter().copied().min().unwrap()
     }
 
+    #[allow(dead_code, unused)]
     fn print_maze(&self, pos: i32, direction: i8) {
         for (i, row) in self.data.chunks(self.size.1 as usize).enumerate() {
             for (j, cell) in row.iter().enumerate() {
@@ -134,7 +135,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(maze.shortest_distance().try_into().unwrap())
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(_input: &str) -> Option<u32> {
     None
 }
 

@@ -1,3 +1,5 @@
+#![allow(dead_code, unused)]
+
 use std::ptr::addr_of_mut;
 
 advent_of_code::solution!(17);

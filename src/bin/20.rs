@@ -1,4 +1,3 @@
-use core::net;
 use std::{collections::HashMap, ops::AddAssign};
 
 advent_of_code::solution!(20);
@@ -145,7 +144,7 @@ pub fn calculate_cheats(input: &str) -> HashMap<i32, i32> {
     savings
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(_input: &str) -> Option<u32> {
     None
 }
 

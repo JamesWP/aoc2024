@@ -66,6 +66,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     part_two_sized(input, (101, 103))
 }
 
+#[allow(dead_code, unused)]
 fn part_two_sized(input: &str, size: (i32, i32)) -> Option<u32> {
     let robots: Vec<_> = parse(input, size).into_iter().collect();
 
@@ -79,7 +80,7 @@ fn part_two_sized(input: &str, size: (i32, i32)) -> Option<u32> {
             )
         };
 
-        let robots: Vec<_> = robots.iter().cloned().map(robot_position).collect();
+        // let robots: Vec<_> = robots.iter().cloned().map(robot_position).collect();
         // println!("Steps: {}", steps);
         // print_robots(robots, size)
     }
@@ -87,6 +88,7 @@ fn part_two_sized(input: &str, size: (i32, i32)) -> Option<u32> {
     Some(6475)
 }
 
+#[allow(dead_code, unused)]
 fn print_robots(robots: Vec<(i32, i32)>, size: (i32, i32)) {
     let mut grid = vec![vec!['.'; size.0 as usize]; size.1 as usize];
 
