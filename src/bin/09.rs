@@ -1,5 +1,3 @@
-use std::fmt::Write;
-
 use itertools::Itertools;
 
 advent_of_code::solution!(9);

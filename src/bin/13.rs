@@ -3,9 +3,9 @@ use itertools::Itertools;
 advent_of_code::solution!(13);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    /// Button A: X+94, Y+34
-    /// Button B: X+22, Y+67
-    /// Prize: X=8400, Y=5400
+    // Button A: X+94, Y+34
+    // Button B: X+22, Y+67
+    // Prize: X=8400, Y=5400
 
 
     let regex = regex::Regex::new(r"Button A: X\+(?<ax>\d+), Y\+(?<ay>\d+)\nButton B: X\+(?<bx>\d+), Y\+(?<by>\d+)\nPrize: X=(?<px>\d+), Y=(?<py>\d+)").unwrap();
@@ -48,7 +48,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     )
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(_input: &str) -> Option<u32> {
     None
 }
 

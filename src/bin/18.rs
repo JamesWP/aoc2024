@@ -1,3 +1,4 @@
+#![allow(dead_code, unused)]
 use std::{cmp::Reverse, collections::BinaryHeap};
 
 advent_of_code::solution!(18);
@@ -56,7 +57,7 @@ fn part_one_sized(input: &str, width: usize, height: usize, steps: usize) -> Opt
     while let Some(Reverse((distance, (x, y)))) = queue.pop() {
         visited[y][x] = true;
 
-        for (direction) in [0, 1, 2, 3] {
+        for direction in [0, 1, 2, 3] {
             let d = match direction {
                 0 if y != 0 => Some((x, y - 1)),
                 1 if x + 1 != width => Some((x + 1, y)),
@@ -90,6 +91,7 @@ fn part_one_sized(input: &str, width: usize, height: usize, steps: usize) -> Opt
     Some(distances[end.1][end.0])
 }
 
+
 fn solve(width: usize, height: usize, grid: Vec<Vec<i32>>) -> Option<u32> {
     let start = (0, 0);
     let end = (width - 1, height - 1);
@@ -104,7 +106,7 @@ fn solve(width: usize, height: usize, grid: Vec<Vec<i32>>) -> Option<u32> {
     while let Some(Reverse((distance, (x, y)))) = queue.pop() {
         visited[y][x] = true;
 
-        for (direction) in [0, 1, 2, 3] {
+        for direction in [0, 1, 2, 3] {
             let d = match direction {
                 0 if y != 0 => Some((x, y - 1)),
                 1 if x + 1 != width => Some((x + 1, y)),

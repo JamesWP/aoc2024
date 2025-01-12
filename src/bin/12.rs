@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    hash::Hash,
-};
+use std::collections::HashSet;
 
 advent_of_code::solution!(12);
 
@@ -33,7 +30,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     )
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(_input: &str) -> Option<u32> {
     None
 }
 
@@ -82,8 +79,8 @@ fn visit(visited: &mut HashSet<i32>, idx: i32, size: (i32, i32), plants: &[char]
 
     let is_same_plant = |n: &i32| *plants.get(*n as usize).unwrap() == plant;
     let not_same_plant = |n: &i32| !is_same_plant(n);
-    let is_already_visited = |n: &i32| visited.contains(n);
-    let not_already_visited = |n: &i32| !is_already_visited(n);
+    // let is_already_visited = |n: &i32| visited.contains(n);
+    //let not_already_visited = |n: &i32| !is_already_visited(n);
 
     // count perimiter if on edge of 'plant'
     let mut perimiter: i32 = neighbors
