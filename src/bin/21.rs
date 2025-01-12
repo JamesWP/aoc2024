@@ -166,16 +166,10 @@ fn numeric_path(start: char, finish: char) -> HashSet<String> {
     numeric_path_coord(num_location(start).unwrap(), num_location(finish).unwrap())
 }
 
-fn path_func(start: char, finish: char, level: usize) -> HashSet<String> {
-    if level == 0 {
-        numeric_path(start, finish)
-    } else {
-        arrow_path(start, finish)
-    }
-}
 
-fn path_length(code: &str, level: usize) -> i32 {
-    if level==4 {
+#[memoize]
+fn path_length(code: String, level: usize, start_level: usize) -> i64 {
+    if level==0 {
         return 1;
     }
 
@@ -183,9 +177,13 @@ fn path_length(code: &str, level: usize) -> i32 {
 
     let mut last = 'A';
     for elem in code.chars() {
-        let paths = path_func(last, elem, level);
+        let paths = if level == start_level {
+            numeric_path(last, elem)
+        } else {
+            arrow_path(last, elem)
+        };
 
-        let smallest_path_length = paths.into_iter().map(|p| path_length(&p, level+1)).min().unwrap();
+        let smallest_path_length = paths.into_iter().map(|p| path_length(p, level-1, start_level)).min().unwrap();
 
         tot += smallest_path_length;
 
@@ -197,16 +195,22 @@ fn path_length(code: &str, level: usize) -> i32 {
 
 pub fn part_one(input: &str) -> Option<u32> {
     Some(input.lines().map(|line| {
-        let num: i32 = line[0..line.len()-2].parse().unwrap();
-        print!("{}: ", line);
-        let length = path_length(line, 0);
-        println!();
+        let num: i64 = line[0..line.len()-1].parse().unwrap();
+        print!("{}: ({})", line, num);
+        let length = path_length(line.to_string(), 4, 4);
+        println!("len: {}", length);
         length * num
-    }).sum::<i32>().try_into().unwrap())
+    }).sum::<i64>().try_into().unwrap())
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<u64> {
+    Some(input.lines().map(|line| {
+        let num: i64 = line[0..line.len()-1].parse().unwrap();
+        print!("{}: ({})", line, num);
+        let length = path_length(line.to_string(), 27, 27);
+        println!("len: {}", length);
+        length * num
+    }).sum::<i64>().try_into().unwrap())
 }
 
 #[cfg(test)]
@@ -249,8 +253,8 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(path_length("029A", 0), 68);
-        assert_eq!(path_length("379A", 0), 64);
+        assert_eq!(path_length("029A", 4, 4), 68);
+        assert_eq!(path_length("379A", 4, 4), 64);
     }
     #[test]
     fn test_part_one() {
