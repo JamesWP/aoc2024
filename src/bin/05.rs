@@ -7,13 +7,18 @@ struct Input {
 
     orderings: Vec<Vec<i32>>,
 }
+#[cfg(windows)]
+const LINE_ENDING: &'static str = "\r\n\r\n";
+#[cfg(not(windows))]
+const LINE_ENDING: &'static str = "\n\n";
 
 impl Input {
     fn parse(input: &str) -> Input {
-        let first = input.split("\n\n").nth(0).unwrap();
+        let first = input.split(LINE_ENDING).nth(0).unwrap();
         let rules = first
             .lines()
             .map(|line| {
+                println!("{line}");
                 let (first_page, subsequent_page) = line.split("|").collect_tuple().unwrap();
                 (
                     first_page.parse().unwrap(),
@@ -22,7 +27,7 @@ impl Input {
             })
             .collect();
 
-        let second = input.split("\n\n").nth(1).unwrap();
+        let second = input.split("\r\n\r\n").nth(1).unwrap();
         let orderings = second
             .lines()
             .map(|line| -> Vec<i32> { line.split(",").map(|i| i.parse().unwrap()).collect() })

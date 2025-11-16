@@ -7,8 +7,10 @@ pub fn part_one(input: &str) -> Option<u32> {
     // Button B: X+22, Y+67
     // Prize: X=8400, Y=5400
 
-
-    let regex = regex::Regex::new(r"Button A: X\+(?<ax>\d+), Y\+(?<ay>\d+)\nButton B: X\+(?<bx>\d+), Y\+(?<by>\d+)\nPrize: X=(?<px>\d+), Y=(?<py>\d+)").unwrap();
+    let regex = r"Button A: X\+(?<ax>\d+), Y\+(?<ay>\d+)\nButton B: X\+(?<bx>\d+), Y\+(?<by>\d+)\nPrize: X=(?<px>\d+), Y=(?<py>\d+)".to_string();
+    #[cfg(windows)]
+    let regex = regex.replace("\\n", "\\r\\n");
+    let regex = regex::Regex::new(&regex).unwrap();
     let caps = regex.captures_iter(input);
     let games = caps.map(|cap| {
         let ax = cap.name("ax").unwrap().as_str().parse::<u32>().unwrap();
