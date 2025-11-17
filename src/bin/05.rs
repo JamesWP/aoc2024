@@ -27,7 +27,7 @@ impl Input {
             })
             .collect();
 
-        let second = input.split("\r\n\r\n").nth(1).unwrap();
+        let second = input.split(LINE_ENDING).nth(1).unwrap();
         let orderings = second
             .lines()
             .map(|line| -> Vec<i32> { line.split(",").map(|i| i.parse().unwrap()).collect() })
