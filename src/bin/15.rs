@@ -120,7 +120,7 @@ impl Display for Grid {
 
 pub fn part_one(input: &str) -> Option<i32> {
     let mut grid = Grid::from(input);
-    println!("{}", &grid);
+    // println!("{}", &grid);
 
     for instruction in grid.instructions.clone() {
         //println!("{}", instruction);

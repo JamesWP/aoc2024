@@ -196,9 +196,9 @@ fn path_length(code: String, level: usize, start_level: usize) -> i64 {
 pub fn part_one(input: &str) -> Option<u32> {
     Some(input.lines().map(|line| {
         let num: i64 = line[0..line.len()-1].parse().unwrap();
-        print!("{}: ({})", line, num);
+        // print!("{}: ({})", line, num);
         let length = path_length(line.to_string(), 4, 4);
-        println!("len: {}", length);
+        // println!("len: {}", length);
         length * num
     }).sum::<i64>().try_into().unwrap())
 }
@@ -206,9 +206,9 @@ pub fn part_one(input: &str) -> Option<u32> {
 pub fn part_two(input: &str) -> Option<u64> {
     Some(input.lines().map(|line| {
         let num: i64 = line[0..line.len()-1].parse().unwrap();
-        print!("{}: ({})", line, num);
+        // print!("{}: ({})", line, num);
         let length = path_length(line.to_string(), 27, 27);
-        println!("len: {}", length);
+        // println!("len: {}", length);
         length * num
     }).sum::<i64>().try_into().unwrap())
 }

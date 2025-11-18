@@ -41,7 +41,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     let mut count = 0;
 
     for line in input.lines() {
-        let mut fixable = false;
+        // let mut fixable = false;
         let levels: Vec<i32> = line
             .split_whitespace()
             .map(str::parse)
@@ -52,11 +52,11 @@ pub fn part_two(input: &str) -> Option<u32> {
             levels.remove(i);
             if safe(levels) {
                 count += 1;
-                fixable = true;
+                // fixable = true;
                 break;
             }
         }
-        println!("{:}, {:}", fixable, line);
+        // println!("{:}, {:}", fixable, line);
     }
 
     Some(count as u32)

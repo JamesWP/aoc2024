@@ -18,7 +18,7 @@ impl Input {
         let rules = first
             .lines()
             .map(|line| {
-                println!("{line}");
+                // println!("{line}");
                 let (first_page, subsequent_page) = line.split("|").collect_tuple().unwrap();
                 (
                     first_page.parse().unwrap(),

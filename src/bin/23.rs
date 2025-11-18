@@ -1,4 +1,4 @@
-use std::{cmp::max, collections::{HashMap, HashSet}};
+use std::{collections::{HashMap, HashSet}};
 
 use itertools::Itertools;
 

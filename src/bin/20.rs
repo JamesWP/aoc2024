@@ -60,7 +60,7 @@ fn parse(input: &str) -> (Vec<bool>, (i32, i32), i32, i32) {
         size.1 += 1;
     }
 
-    println!("end: {}", end);
+    // println!("end: {}", end);
     assert!(start != -1 && end != -1);
 
     (maze, size, start, end)
@@ -119,22 +119,22 @@ pub fn calculate_cheats(input: &str) -> HashMap<i32, i32> {
 
             let saving = original_length - (distance_to_start + distance_to_end) -3;
 
-            println!("ShortestDist to start: {distance_to_start} end: {distance_to_end} Diff: {saving}");
+            // println!("ShortestDist to start: {distance_to_start} end: {distance_to_end} Diff: {saving}");
             for i in 0..maze.len() {
                 if i % size.0 as usize == 0 {
-                    println!();
+                    // println!();
                 }
                 if i == a {
-                    print!("1");
+                    // print!("1");
                 } else if i == b {
-                    print!("2");
+                    // print!("2");
                 } else if maze[i] {
-                    print!("#");
+                    // print!("#");
                 } else {
-                    print!(".");
+                    // print!(".");
                 }
             }
-            println!();
+            // println!();
 
             savings.entry(saving).or_insert(0).add_assign(1);
         }

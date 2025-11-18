@@ -10,7 +10,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         let lhs = capture.name("lhs");
         let rhs = capture.name("rhs");
 
-        dbg!(lhs, rhs);
+        //dbg!(lhs, rhs);
         count += match (lhs, rhs) {
             (Some(lhs), Some(rhs)) => {
                 lhs.as_str().parse::<u32>().unwrap() * rhs.as_str().parse::<u32>().unwrap()

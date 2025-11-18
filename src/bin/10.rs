@@ -70,9 +70,9 @@ pub fn part_one(input: &str) -> Option<u32> {
 
     for y in 0..grid.height {
         for x in 0..grid.width {
-            print!("scoring: x: {}, y: {}", x, y);
+            // print!("scoring: x: {}, y: {}", x, y);
             let score = score_path(&grid, (x, y));
-            println!(" score: {}", score);
+            // println!(" score: {}", score);
             total_score += score;
         }
     }
