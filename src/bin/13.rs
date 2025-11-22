@@ -38,7 +38,7 @@ pub fn part_one(input: &str) -> Option<u32> {
                 }
             })
             .min();
-        // dbg!(min_score)
+        min_score
     };
 
     Some(
