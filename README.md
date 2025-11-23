@@ -7,7 +7,10 @@ Solutions for [Advent of Code](https://adventofcode.com/) in [Rust](https://www.
 <!--- advent_readme_stars table --->
 
 <!--- benchmarking table --->
-
+```bash
+james@JamesTP:~/gits/aoc2024$ sudo apt install libz3-dev
+james@JamesTP:~/gits/aoc2024$ sudo apt install clang
+```
 ---
 
 ## Template setup

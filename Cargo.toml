@@ -29,5 +29,6 @@ memoize = "0.4.2"
 pico-args = "0.5.0"
 regex = "1.11.1"
 tinyjson = "2.5.1"
+z3 = "0.19.5"
 
 # Solution dependencies
