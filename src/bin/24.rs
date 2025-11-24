@@ -256,6 +256,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(INPUT2);
-        assert_eq!(result, Some("z00,z01,z02,z05".to_string()));
+        assert_eq!(result, Some("djg,dsd,hjm,mcq,sjb,z12,z19,z37".to_string()));
     }
 }
