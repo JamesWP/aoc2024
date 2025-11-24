@@ -17,13 +17,20 @@ impl From<&str> for Grid {
         let width = input.lines().count();
         let height = input.lines().next().unwrap().len() as i32;
 
-        Grid { cells, width: width as i32, height: height as i32 }
+        Grid {
+            cells,
+            width: width as i32,
+            height: height as i32,
+        }
     }
 }
 
 // test a path recursively
 fn score_path(grid: &Grid, location: (i32, i32)) -> u32 {
-    score_partial_path(grid, location, 0).len().try_into().unwrap()
+    score_partial_path(grid, location, 0)
+        .len()
+        .try_into()
+        .unwrap()
 }
 
 #[memoize(Ignore: grid)]
@@ -60,7 +67,6 @@ fn score_partial_path(grid: &Grid, location: (i32, i32), steps_taken: u32) -> Ha
     }
 
     paths
-
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
@@ -76,7 +82,6 @@ pub fn part_one(input: &str) -> Option<u32> {
             total_score += score;
         }
     }
-
 
     Some(total_score.try_into().unwrap())
 }

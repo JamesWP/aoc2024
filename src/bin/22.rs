@@ -1,4 +1,9 @@
-use std::{collections::{HashMap, HashSet}, default, ops::DerefMut, slice::Windows};
+use std::{
+    collections::{HashMap, HashSet},
+    default,
+    ops::DerefMut,
+    slice::Windows,
+};
 
 advent_of_code::solution!(22);
 
@@ -22,7 +27,7 @@ fn get_2000th_secret(starting_secret: u64) -> u64 {
     let nums = 0..2000_u64;
     let mut secret = starting_secret;
     // print!("Secret Starting: {:8}", starting_secret);
-    nums.for_each(|num|{
+    nums.for_each(|num| {
         // let old_secret = secret;
         secret = generate_next_secret(secret, num);
         // if num < 100 {print!(", {:2}", ((secret as i64%10) - (old_secret as i64%10))); }
@@ -33,46 +38,53 @@ fn get_2000th_secret(starting_secret: u64) -> u64 {
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let nums = input.lines().map(str::parse::<u64>).map(Result::unwrap).map(get_2000th_secret);
+    let nums = input
+        .lines()
+        .map(str::parse::<u64>)
+        .map(Result::unwrap)
+        .map(get_2000th_secret);
     Some(nums.sum())
 }
 
 fn sequence<'a>(secret: u64) -> Vec<(u32, u8)> {
-    let mut sequence = [0;2000];
-    let mut sequence_deltas=[0_i8; 1999];
+    let mut sequence = [0; 2000];
+    let mut sequence_deltas = [0_i8; 1999];
     sequence[0] = secret as i64;
     for idx in 1..2000 {
-        sequence[idx] = generate_next_secret(sequence[idx-1] as u64, idx as u64) as i64;
-        let delta = (sequence[idx]%10) - (sequence[idx-1]%10);
-        sequence_deltas[idx-1] = (delta+9) as i8;
+        sequence[idx] = generate_next_secret(sequence[idx - 1] as u64, idx as u64) as i64;
+        let delta = (sequence[idx] % 10) - (sequence[idx - 1] % 10);
+        sequence_deltas[idx - 1] = (delta + 9) as i8;
     }
 
     let mut seen: HashSet<u32> = Default::default();
     let mut deltas = vec![];
 
-    let prices = sequence.iter().skip(4).map(|x| (x%10) as u8);
+    let prices = sequence.iter().skip(4).map(|x| (x % 10) as u8);
 
-    let windows: Vec<u32> = sequence_deltas.windows(4).map(|window| {
-        let a = window[0] as i32;
-        let b = window[1] as i32;
-        let c = window[2] as i32;
-        let d = window[3] as i32;
-        let score = a << (8+8+8) | b << (8+8) | c << 8 | d;
-        // if a==-2+9&&b==1+9&&c==-1+9&&d==3+9 {
+    let windows: Vec<u32> = sequence_deltas
+        .windows(4)
+        .map(|window| {
+            let a = window[0] as i32;
+            let b = window[1] as i32;
+            let c = window[2] as i32;
+            let d = window[3] as i32;
+            let score = a << (8 + 8 + 8) | b << (8 + 8) | c << 8 | d;
+            // if a==-2+9&&b==1+9&&c==-1+9&&d==3+9 {
             // println!("Scoring: {a}, {b}, {c}, {d} = {score}");
-        // }
-        score as u32
-    }).collect();
+            // }
+            score as u32
+        })
+        .collect();
 
     for (window, price) in windows.into_iter().zip(prices) {
         if !seen.contains(&window) {
             seen.insert(window);
             deltas.push((window, price));
             // if window ==0x70a080c {
-                // println!("Scoring: {window} = {price}");
+            // println!("Scoring: {window} = {price}");
             // }
         }
-    };
+    }
 
     deltas
 }
@@ -90,7 +102,11 @@ find dict entry with highest count
 */
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let nums: Vec<u64> = input.lines().map(str::parse::<u64>).map(Result::unwrap).collect();
+    let nums: Vec<u64> = input
+        .lines()
+        .map(str::parse::<u64>)
+        .map(Result::unwrap)
+        .collect();
 
     // dbg!(&nums);
 
@@ -119,12 +135,11 @@ mod tests {
         let a = sequence(2024);
 
         for (a, b) in a {
-    // println!("Val: {}", delta_score.get(&0x70a080c).unwrap_or(&0));
-            if a ==0x70a080c  {
+            // println!("Val: {}", delta_score.get(&0x70a080c).unwrap_or(&0));
+            if a == 0x70a080c {
                 // println!("B: {b}");
             }
         }
-
     }
 
     #[test]

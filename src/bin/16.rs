@@ -1,7 +1,4 @@
-use std::{
-    cmp::Reverse,
-    collections::BinaryHeap
-};
+use std::{cmp::Reverse, collections::BinaryHeap};
 
 advent_of_code::solution!(16);
 

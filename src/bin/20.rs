@@ -26,7 +26,7 @@ fn dijkstra(maze: &[bool], distances: &mut [i32], size: (i32, i32), end: i32) {
         // }
         // println!();
 
-        let neighbors = [index+1, index-1, index + size.1, index - size.1];
+        let neighbors = [index + 1, index - 1, index + size.1, index - size.1];
 
         for neighbor_index in neighbors.into_iter() {
             if maze[neighbor_index as usize] {
@@ -67,7 +67,14 @@ fn parse(input: &str) -> (Vec<bool>, (i32, i32), i32, i32) {
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    Some(calculate_cheats(input).into_iter().filter(|(_, v)| *v >= 100).count().try_into().unwrap())
+    Some(
+        calculate_cheats(input)
+            .into_iter()
+            .filter(|(_, v)| *v >= 100)
+            .count()
+            .try_into()
+            .unwrap(),
+    )
 }
 
 pub fn calculate_cheats(input: &str) -> HashMap<i32, i32> {
@@ -81,8 +88,8 @@ pub fn calculate_cheats(input: &str) -> HashMap<i32, i32> {
 
     let original_length = distances_to_start[end as usize];
 
-    let mut shortest_distance_to_start:Vec<i32> = Vec::new();
-    let mut shortest_distance_to_end:Vec<i32> = Vec::new();
+    let mut shortest_distance_to_start: Vec<i32> = Vec::new();
+    let mut shortest_distance_to_end: Vec<i32> = Vec::new();
     for i in 0i32..maze.len() as i32 {
         // if on edge, skip
         let (x, y) = (i % size.0, i / size.0);
@@ -92,32 +99,41 @@ pub fn calculate_cheats(input: &str) -> HashMap<i32, i32> {
             continue;
         }
 
-        let neighbors = [i+1, i-1, i + size.1, i - size.1];
-        let min_distance_to_start = neighbors.into_iter().map(|neighbor_index| distances_to_start[neighbor_index as usize]).min().unwrap();
-        let min_distance_to_end = neighbors.into_iter().map(|neighbor_index| distances_to_end[neighbor_index as usize]).min().unwrap();
+        let neighbors = [i + 1, i - 1, i + size.1, i - size.1];
+        let min_distance_to_start = neighbors
+            .into_iter()
+            .map(|neighbor_index| distances_to_start[neighbor_index as usize])
+            .min()
+            .unwrap();
+        let min_distance_to_end = neighbors
+            .into_iter()
+            .map(|neighbor_index| distances_to_end[neighbor_index as usize])
+            .min()
+            .unwrap();
         shortest_distance_to_start.push(min_distance_to_start);
         shortest_distance_to_end.push(min_distance_to_end);
     }
 
     // for each adjacent pair of cells
     let mut savings = HashMap::new();
-    for x in 1..size.0-2 {
-        for y in 1..size.1-1 {
+    for x in 1..size.0 - 2 {
+        for y in 1..size.1 - 1 {
             let a = (y * size.0 + x) as usize;
-            let b = a+1;
+            let b = a + 1;
 
-            let distance_to_start = shortest_distance_to_start[a].min(shortest_distance_to_start[b]);
+            let distance_to_start =
+                shortest_distance_to_start[a].min(shortest_distance_to_start[b]);
             let distance_to_end = shortest_distance_to_end[a].min(shortest_distance_to_end[b]);
 
             if distance_to_start == i32::MAX || distance_to_end == i32::MAX {
                 continue;
             }
 
-            if distance_to_start + distance_to_end -3 > original_length {
+            if distance_to_start + distance_to_end - 3 > original_length {
                 continue;
             }
 
-            let saving = original_length - (distance_to_start + distance_to_end) -3;
+            let saving = original_length - (distance_to_start + distance_to_end) - 3;
 
             // println!("ShortestDist to start: {distance_to_start} end: {distance_to_end} Diff: {saving}");
             for i in 0..maze.len() {
@@ -140,7 +156,6 @@ pub fn calculate_cheats(input: &str) -> HashMap<i32, i32> {
         }
     }
 
-
     savings
 }
 
@@ -154,12 +169,10 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-
         let (maze, size, start, end) = parse(&advent_of_code::template::read_file("examples", DAY));
         let mut distances = vec![std::i32::MAX; maze.len()];
         dijkstra(&maze, &mut distances, size, start);
         assert_eq!(distances[end as usize], 84);
-
 
         let cheats = calculate_cheats(&advent_of_code::template::read_file("examples", DAY));
         dbg!(&cheats);

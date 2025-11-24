@@ -159,17 +159,19 @@ fn numeric_path_coord(start: (i32, i32), finish: (i32, i32)) -> HashSet<String> 
 }
 
 fn arrow_path(start: char, finish: char) -> HashSet<String> {
-    arrow_path_coord(arrow_location(start).unwrap(), arrow_location(finish).unwrap())
+    arrow_path_coord(
+        arrow_location(start).unwrap(),
+        arrow_location(finish).unwrap(),
+    )
 }
 
 fn numeric_path(start: char, finish: char) -> HashSet<String> {
     numeric_path_coord(num_location(start).unwrap(), num_location(finish).unwrap())
 }
 
-
 #[memoize]
 fn path_length(code: String, level: usize, start_level: usize) -> i64 {
-    if level==0 {
+    if level == 0 {
         return 1;
     }
 
@@ -183,7 +185,11 @@ fn path_length(code: String, level: usize, start_level: usize) -> i64 {
             arrow_path(last, elem)
         };
 
-        let smallest_path_length = paths.into_iter().map(|p| path_length(p, level-1, start_level)).min().unwrap();
+        let smallest_path_length = paths
+            .into_iter()
+            .map(|p| path_length(p, level - 1, start_level))
+            .min()
+            .unwrap();
 
         tot += smallest_path_length;
 
@@ -194,23 +200,37 @@ fn path_length(code: String, level: usize, start_level: usize) -> i64 {
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    Some(input.lines().map(|line| {
-        let num: i64 = line[0..line.len()-1].parse().unwrap();
-        // print!("{}: ({})", line, num);
-        let length = path_length(line.to_string(), 4, 4);
-        // println!("len: {}", length);
-        length * num
-    }).sum::<i64>().try_into().unwrap())
+    Some(
+        input
+            .lines()
+            .map(|line| {
+                let num: i64 = line[0..line.len() - 1].parse().unwrap();
+                // print!("{}: ({})", line, num);
+                let length = path_length(line.to_string(), 4, 4);
+                // println!("len: {}", length);
+                length * num
+            })
+            .sum::<i64>()
+            .try_into()
+            .unwrap(),
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    Some(input.lines().map(|line| {
-        let num: i64 = line[0..line.len()-1].parse().unwrap();
-        // print!("{}: ({})", line, num);
-        let length = path_length(line.to_string(), 27, 27);
-        // println!("len: {}", length);
-        length * num
-    }).sum::<i64>().try_into().unwrap())
+    Some(
+        input
+            .lines()
+            .map(|line| {
+                let num: i64 = line[0..line.len() - 1].parse().unwrap();
+                // print!("{}: ({})", line, num);
+                let length = path_length(line.to_string(), 27, 27);
+                // println!("len: {}", length);
+                length * num
+            })
+            .sum::<i64>()
+            .try_into()
+            .unwrap(),
+    )
 }
 
 #[cfg(test)]

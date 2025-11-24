@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use itertools::Itertools;
-use z3::{self, SatResult, Solvable, Solver};
 use z3::ast::*;
+use z3::{self, SatResult, Solvable, Solver};
 
 advent_of_code::solution!(24);
 
@@ -52,7 +52,9 @@ fn calculate_z(
     // dbg!(&bits);
 
     let result = solver.check();
-    if result != SatResult::Sat { return None; }
+    if result != SatResult::Sat {
+        return None;
+    }
     assert!(result == SatResult::Sat);
     let model = solver.get_model().unwrap();
     let v = bits.read_from_model(&model, false).unwrap();
@@ -74,9 +76,9 @@ fn calculate_z(
 }
 
 #[derive(Debug)]
-struct Gate{
+struct Gate {
     output: Bool,
-    op: Bool
+    op: Bool,
 }
 
 fn parse(input: &str) -> (u64, u64, HashMap<std::string::String, Bool>, Vec<Gate>) {
@@ -119,7 +121,7 @@ fn parse(input: &str) -> (u64, u64, HashMap<std::string::String, Bool>, Vec<Gate
     let y = y;
 
     let mut input_vals: HashMap<std::string::String, Bool> = Default::default();
-    let mut ops:Vec<Gate> = vec![];
+    let mut ops: Vec<Gate> = vec![];
 
     while let Some(line) = lines.next() {
         if line.len() == 0 {
@@ -157,7 +159,10 @@ fn parse(input: &str) -> (u64, u64, HashMap<std::string::String, Bool>, Vec<Gate
             "AND" => input_1 & input_2,
             _ => todo!(),
         };
-        ops.push(Gate{ output: varname.clone(), op: op});
+        ops.push(Gate {
+            output: varname.clone(),
+            op: op,
+        });
     }
 
     (x, y, input_vals, ops)
@@ -173,9 +178,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(value)
 }
 
-
 pub fn part_two(input: &str) -> Option<std::string::String> {
-
     let mut y: u64 = 0;
     for bit in 0..64 {
         let x = 1;
@@ -184,10 +187,10 @@ pub fn part_two(input: &str) -> Option<std::string::String> {
         println!("Actual: {:064b}", y + x);
         let z = calculate_z(x, y, &input_vals, &ops).unwrap();
         println!("Calcul: {:064b}", z);
-        if z != x+y {
+        if z != x + y {
             break;
         }
-        y |= 1<<bit;
+        y |= 1 << bit;
     }
 
     Some("djg,dsd,hjm,mcq,sjb,z12,z19,z37".to_string())

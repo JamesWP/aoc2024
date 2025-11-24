@@ -31,10 +31,7 @@ impl From<&str> for Grid {
             input.lines().count() as i32,
         );
 
-        Grid {
-            size,
-            antennas,
-        }
+        Grid { size, antennas }
     }
 }
 

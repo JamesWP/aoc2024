@@ -91,7 +91,6 @@ fn part_one_sized(input: &str, width: usize, height: usize, steps: usize) -> Opt
     Some(distances[end.1][end.0])
 }
 
-
 fn solve(width: usize, height: usize, grid: Vec<Vec<i32>>) -> Option<u32> {
     let start = (0, 0);
     let end = (width - 1, height - 1);
