@@ -230,6 +230,17 @@ x05 AND y05 -> z00
 mod tests {
     use super::*;
 
+    #[ignore]
+    #[test]
+    fn test_z3_version() {
+        // Panic when using clone() after push() on Solver
+        // https://github.com/prove-rs/z3.rs/issues/474
+        println!("Z3 Version: {}", z3::full_version());
+        let solver = z3::Solver::new();
+        solver.push();
+        let _ = solver.clone();
+    }
+
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
