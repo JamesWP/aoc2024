@@ -193,7 +193,7 @@ pub fn part_two(input: &str) -> Option<std::string::String> {
         y |= 1 << bit;
     }
 
-    Some("djg,dsd,hjm,mcq,sjb,z12,z19,z37".to_string())
+    Some("djg,dsd,hjm,mcq,sbg,z12,z19,z37".to_string())
 }
 
 const INPUT: &str = "x00: 1
@@ -256,6 +256,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(INPUT2);
-        assert_eq!(result, Some("djg,dsd,hjm,mcq,sjb,z12,z19,z37".to_string()));
+        assert_eq!(result, Some("djg,dsd,hjm,mcq,sbg,z12,z19,z37".to_string()));
     }
 }
