@@ -1,5 +1,7 @@
 use std::{collections::HashMap, ops::AddAssign};
 
+use itertools::Itertools;
+
 advent_of_code::solution!(20);
 
 fn dijkstra(maze: &[bool], distances: &mut [i32], size: (i32, i32), end: i32) {
@@ -9,6 +11,7 @@ fn dijkstra(maze: &[bool], distances: &mut [i32], size: (i32, i32), end: i32) {
     let mut visited = vec![false; maze.len()];
 
     queue.push(std::cmp::Reverse((0i32, end)));
+    distances[end as usize] = 0;
 
     while let Some(std::cmp::Reverse((distance, index))) = queue.pop() {
         visited[index as usize] = true;
@@ -66,101 +69,103 @@ fn parse(input: &str) -> (Vec<bool>, (i32, i32), i32, i32) {
     (maze, size, start, end)
 }
 
-pub fn part_one(input: &str) -> Option<u32> {
+pub fn part_one(input: &str) -> Option<i32> {
     Some(
-        calculate_cheats(input)
+        calculate_cheats(input, 2)
             .into_iter()
-            .filter(|(_, v)| *v >= 100)
-            .count()
-            .try_into()
-            .unwrap(),
+            .filter(|(k, _)| *k >= 100)
+            .map(|(k, v)| v)
+            .sum(),
     )
 }
+fn cheat_saving(c1: i32, c2: i32, d_start: &[i32], d_end: &[i32], start: i32) -> i32 {
+    let post_cheat_distance = d_end[c2 as usize];
+    let pre_cheat_distance = d_start[c1 as usize];
+    let cheat_dist = post_cheat_distance + pre_cheat_distance + 2;
+    let nocheat_dist = d_end[start as usize];
+    nocheat_dist - cheat_dist
+}
 
-pub fn calculate_cheats(input: &str) -> HashMap<i32, i32> {
+fn cheats(start: i32, len: usize, size: (i32, i32)) -> impl Iterator<Item = i32> {
+    let len_limit = len as i32;
+    let (startx, starty): (i32, i32) = (start % size.1, start / size.1);
+
+    let xs = startx - len_limit..=startx + len_limit;
+    let ys = starty - len_limit..=starty + len_limit;
+    xs.cartesian_product(ys)
+        .filter(move |(x, y)| {
+            let length = startx.abs_diff(*x) + starty.abs_diff(*y);
+            length <= len_limit as u32 && length > 0
+        })
+        .map(move |(x, y)| y * size.1 + x)
+}
+
+pub fn calculate_cheats(input: &str, cheat_len: usize) -> HashMap<i32, i32> {
     let (maze, size, start, end) = parse(input);
 
-    let mut distances_to_end = vec![std::i32::MAX; maze.len()];
-    dijkstra(&maze, &mut distances_to_end, size, end);
+    let mut d_end = vec![std::i32::MAX; maze.len()];
+    dijkstra(&maze, &mut d_end, size, end);
 
-    let mut distances_to_start = vec![std::i32::MAX; maze.len()];
-    dijkstra(&maze, &mut distances_to_start, size, start);
+    let mut d_start = vec![std::i32::MAX; maze.len()];
+    dijkstra(&maze, &mut d_start, size, start);
 
-    let original_length = distances_to_start[end as usize];
+    // for each wall in maze
+    let mut savings = HashMap::new();
 
-    let mut shortest_distance_to_start: Vec<i32> = Vec::new();
-    let mut shortest_distance_to_end: Vec<i32> = Vec::new();
-    for i in 0i32..maze.len() as i32 {
-        // if on edge, skip
-        let (x, y) = (i % size.0, i / size.0);
-        if x == 0 || x == size.0 - 1 || y == 0 || y == size.1 - 1 {
-            shortest_distance_to_start.push(i32::MAX);
-            shortest_distance_to_end.push(i32::MAX);
+    let width = size.1 as usize;
+    let height = size.0 as usize;
+
+    let valid = |pos| {
+        if pos >= maze.len() {
+            return false;
+        }
+
+        let x = pos % width;
+        let y = pos / width;
+        if x == 0 || x == width - 1 {
+            return false;
+        }
+        if y == 0 || y == height - 1 {
+            return false;
+        }
+        true
+    };
+
+    // cheat starts on that position
+    for pos in 0..(maze.len()) {
+        if !valid(pos) || maze[pos] {
             continue;
         }
+        let cheat_start = pos as i32;
+        // for each direction of cheat
+        for cheat_end in cheats(cheat_start, cheat_len, size) {
+            if !valid(cheat_end as usize) || maze[cheat_end as usize] {
+                continue;
+            }
+            let saving = cheat_saving(cheat_start, cheat_end, &d_start, &d_end, start);
 
-        let neighbors = [i + 1, i - 1, i + size.1, i - size.1];
-        let min_distance_to_start = neighbors
-            .into_iter()
-            .map(|neighbor_index| distances_to_start[neighbor_index as usize])
-            .min()
-            .unwrap();
-        let min_distance_to_end = neighbors
-            .into_iter()
-            .map(|neighbor_index| distances_to_end[neighbor_index as usize])
-            .min()
-            .unwrap();
-        shortest_distance_to_start.push(min_distance_to_start);
-        shortest_distance_to_end.push(min_distance_to_end);
-    }
-
-    // for each adjacent pair of cells
-    let mut savings = HashMap::new();
-    for x in 1..size.0 - 2 {
-        for y in 1..size.1 - 1 {
-            let a = (y * size.0 + x) as usize;
-            let b = a + 1;
-
-            let distance_to_start =
-                shortest_distance_to_start[a].min(shortest_distance_to_start[b]);
-            let distance_to_end = shortest_distance_to_end[a].min(shortest_distance_to_end[b]);
-
-            if distance_to_start == i32::MAX || distance_to_end == i32::MAX {
+            if saving < 1 {
                 continue;
             }
 
-            if distance_to_start + distance_to_end - 3 > original_length {
-                continue;
-            }
-
-            let saving = original_length - (distance_to_start + distance_to_end) - 3;
-
-            // println!("ShortestDist to start: {distance_to_start} end: {distance_to_end} Diff: {saving}");
-            for i in 0..maze.len() {
-                if i % size.0 as usize == 0 {
-                    // println!();
-                }
-                if i == a {
-                    // print!("1");
-                } else if i == b {
-                    // print!("2");
-                } else if maze[i] {
-                    // print!("#");
-                } else {
-                    // print!(".");
-                }
-            }
-            // println!();
-
-            savings.entry(saving).or_insert(0).add_assign(1);
+            let total = savings.entry(saving).or_default();
+            *total += 1;
         }
+        // calculate savings
+        // accumulate count of cheats
     }
 
     savings
 }
 
-pub fn part_two(_input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<i32> {
+    Some(
+        calculate_cheats(input, 20)
+            .into_iter()
+            .filter(|(k, _)| *k >= 100)
+            .map(|(_k, v)| v)
+            .sum(),
+    )
 }
 
 #[cfg(test)]
@@ -168,19 +173,59 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part_one() {
+    fn test_dijstra() {
         let (maze, size, start, end) = parse(&advent_of_code::template::read_file("examples", DAY));
-        let mut distances = vec![std::i32::MAX; maze.len()];
-        dijkstra(&maze, &mut distances, size, start);
-        assert_eq!(distances[end as usize], 84);
+        let mut d_start = vec![std::i32::MAX; maze.len()];
+        dijkstra(&maze, &mut d_start, size, start);
+        assert_eq!(d_start[end as usize], 84);
+        assert_eq!(d_start[start as usize], 0);
 
-        let cheats = calculate_cheats(&advent_of_code::template::read_file("examples", DAY));
-        dbg!(&cheats);
-        //assert_eq!(cheats.get(&2), Some(&14));
-        //assert_eq!(cheats.get(&36), Some(&1));
+        let mut d_end = vec![std::i32::MAX; maze.len()];
+        dijkstra(&maze, &mut d_end, size, end);
 
+        let c1 = start + 6 + size.1 * 4;
+        let c2 = end;
+        assert_eq!(cheat_saving(c1, c2, &d_start, &d_end, start), 64);
+
+        let c1 = start + 7 + size.1 * 4;
+        let c2 = c1 + size.1 * 2;
+        assert_eq!(cheat_saving(c1, c2, &d_start, &d_end, start), 38);
+    }
+
+    #[test]
+    fn test_cheats() {
+        /*
+        [.....] 0-4
+        [.....] 5-9
+        [..c..] 10-12-14
+        [.....] 15-19
+        [.....] 20-24
+        */
+        let cheats = cheats(2 + 5 + 5, 1, (5, 5));
+        // cheats.for_each(|c| println!("{c}"));
+        assert_eq!(cheats.count(), 4);
+    }
+
+    #[test]
+    fn test_calculate_cheats() {
+        let cheats = calculate_cheats(&advent_of_code::template::read_file("examples", DAY), 2);
+        // dbg!(&cheats);
+        assert_eq!(cheats.get(&2), Some(&14));
+        assert_eq!(cheats.get(&36), Some(&1));
+    }
+    #[test]
+    fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(0));
+    }
+
+    #[test]
+    fn test_part_two_decomp() {
+        let input: &str = &advent_of_code::template::read_file("examples", DAY);
+        calculate_cheats(input, 20)
+            .into_iter()
+            .filter(|(k, _)| *k >= 50)
+            .for_each(|(k, v)| println!("there are {v} cheats saving {k}"));
     }
 
     #[test]
